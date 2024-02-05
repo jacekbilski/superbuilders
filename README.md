@@ -18,11 +18,14 @@ That's why the idea of Super Builders came to be, I simply didn't want to write 
 
 ## Goals
 
-* generating builders for classes, records and interfaces
+* generating builders for classes, records and maybe interfaces
 * generating builders for class hierarchies, with a possibility to set fields from superclasses
+* no runtime dependency, only compile-time
 * pre-filling builders with random data
 * for fields with complex types
   * ability to also build those with their own builders
   * alter already partially configured fields with lambdas
+* collections support - clear, addSingle, addAll, set
+* thread safety, builders are immutable, every change creates a new builder instance
 * possibility to provide own defaults or implementations
 * in general - make the builders as powerful as humanly possible so that their users can create new objects with minimal fuss
