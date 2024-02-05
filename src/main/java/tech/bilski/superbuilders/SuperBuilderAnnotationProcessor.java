@@ -52,7 +52,7 @@ public class SuperBuilderAnnotationProcessor extends AbstractProcessor {
 
     Builder builder = new Builder();
     builder.className = className + "Builder";
-    builder.source = "package tech.bilski.superbuilders;\npublic class SomeClassBuilder{private String msg;\npublic SomeClassBuilder withMsg(String msg){this.msg=msg;return this;}\npublic SomeClass build() {return new SomeClass(msg);}}";
+    builder.source = "package tech.bilski.superbuilders;\npublic class JavaBeanBuilder{private String str;\npublic JavaBeanBuilder withStr(String str){this.str=str;return this;}\npublic JavaBean build() {return new JavaBean(str);}}";
     return builder;
   }
 
