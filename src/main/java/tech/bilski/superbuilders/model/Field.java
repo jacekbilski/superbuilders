@@ -13,7 +13,7 @@ public class Field {
   }
 
   public String nameAsSuffix() {
-    return name;
+    return name.substring(0, 1).toUpperCase() + name.substring(1);
   }
 
   public String getName() {

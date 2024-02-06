@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
@@ -69,12 +70,14 @@ public class SuperBuilderAnnotationProcessor extends AbstractProcessor {
         .append("public class ").append(builderName).append("{\n");
     for (Field field : fields) {
       source.append("private ").append(field.getType()).append(" ").append(field.getName()).append(";\n");
-      source.append("public ").append(builderName).append(" withStr(").append(field.getType())
+      source.append("public ").append(builderName).append(" with").append(field.nameAsSuffix())
+          .append("(").append(field.getType())
           .append(" ").append(field.getName()).append("){\nthis.").append(field.getName())
           .append("=").append(field.getName()).append(";\nreturn this;\n}\n");
     }
-    source.append("public ").append(fqn).append(" build() {return new ").append(fqn)
-        .append("(str);}\n");
+    source.append("public ").append(fqn).append(" build() {return new ").append(fqn).append("(")
+        .append(fields.stream().map(Field::getName).collect(Collectors.joining(",")))
+        .append(");}\n");
     source.append("}");
 
     Builder builder = new Builder();
