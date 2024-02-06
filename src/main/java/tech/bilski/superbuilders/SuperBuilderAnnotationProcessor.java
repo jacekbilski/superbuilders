@@ -3,6 +3,8 @@ package tech.bilski.superbuilders;
 import com.google.auto.service.AutoService;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Processor;
@@ -14,6 +16,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
+import tech.bilski.superbuilders.model.Field;
 
 @AutoService(Processor.class)
 @SupportedAnnotationTypes("tech.bilski.superbuilders.SuperBuilder")
@@ -45,19 +48,38 @@ public class SuperBuilderAnnotationProcessor extends AbstractProcessor {
     int lastDot = fqn.lastIndexOf('.');
     String className = fqn.substring(lastDot + 1);
     String packageName = fqn.substring(0, lastDot);
-    System.out.println("fqn: " + fqn);
+    List<Field> fields = new ArrayList<>();
+
     for (Element enclosedElement : element.getEnclosedElements()) {
-      System.out.println("XYZABC Element has " + enclosedElement.getKind() + ": " + enclosedElement);
+      switch (enclosedElement.getKind()) {
+        case FIELD: {
+          Field field = new Field(enclosedElement);
+          System.out.println("XYZABC " + field);
+          fields.add(field);
+          break;
+        }
+        default: {
+          System.out.println("XYZABC Found something: " + enclosedElement.getKind() + " by the name of \""
+              + enclosedElement.getSimpleName() + "\": " + enclosedElement);
+        }
+      }
     }
     String builderName = className + "Builder";
+    StringBuilder source = new StringBuilder().append("package ").append(packageName).append(";\n")
+        .append("public class ").append(builderName).append("{\n");
+    for (Field field : fields) {
+      source.append("private ").append(field.getType()).append(" ").append(field.getName()).append(";\n");
+      source.append("public ").append(builderName).append(" withStr(").append(field.getType())
+          .append(" ").append(field.getName()).append("){\nthis.").append(field.getName())
+          .append("=").append(field.getName()).append(";\nreturn this;\n}\n");
+    }
+    source.append("public ").append(fqn).append(" build() {return new ").append(fqn)
+        .append("(str);}\n");
+    source.append("}");
 
     Builder builder = new Builder();
     builder.className = packageName + "." + builderName;
-    builder.source = "package "+packageName+";\n"
-        + "public class " + builderName + "{\n"
-        + "private String str;\n"
-        + "public " + builderName + " withStr(String str){this.str=str;return this;}\n"
-        + "public " + fqn + " build() {return new " + fqn + "(str);}}";
+    builder.source = source.toString();
     return builder;
   }
 
