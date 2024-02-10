@@ -1,6 +1,5 @@
 package tech.bilski.superbuilders;
 
-import com.google.auto.service.AutoService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -8,11 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
@@ -20,9 +15,9 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import tech.bilski.superbuilders.model.Field;
 
-@AutoService(Processor.class)
-@SupportedAnnotationTypes("tech.bilski.superbuilders.SuperBuilder")
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+//@AutoService(Processor.class)
+//@SupportedAnnotationTypes("tech.bilski.superbuilders.SuperBuilder")
+//@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class SuperBuilderAnnotationProcessor extends AbstractProcessor {
 
   @Override
