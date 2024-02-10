@@ -14,6 +14,7 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
@@ -45,11 +46,26 @@ public class SuperBuilderAnnotationProcessor extends AbstractProcessor {
   }
 
   private Builder createBuilder(Element element) {
+    String parentClass = null;
+    String targetClassName; // TODO - bad name, it's part of filename to which we'll be writing the source
     String fqn = element.asType().toString();
+    System.out.println("XYZABC fqn: " + fqn);
     int lastDot = fqn.lastIndexOf('.');
     String className = fqn.substring(lastDot + 1);
-    String packageName = fqn.substring(0, lastDot);
+    String builderName = className + "Builder";
+    String packageName;
     List<Field> fields = new ArrayList<>();
+    System.out.println("XYZABC this, " + element + ", kind: " + element.getKind());
+    Element parent = element.getEnclosingElement();
+    System.out.println("XYZABC parent, " + parent + ", kind: " + parent.getKind());
+    if (parent.getKind() == ElementKind.PACKAGE) {
+      packageName = parent.toString();
+      targetClassName = builderName;
+    } else {
+      packageName = parent.getEnclosingElement().toString();  // only single nesting supported so far
+      parentClass = parent.getSimpleName().toString();
+      targetClassName = parentClass + "$" + className;
+    }
 
     for (Element enclosedElement : element.getEnclosedElements()) {
       switch (enclosedElement.getKind()) {
@@ -60,16 +76,24 @@ public class SuperBuilderAnnotationProcessor extends AbstractProcessor {
           break;
         }
         default: {
-          System.out.println("XYZABC Found something: " + enclosedElement.getKind() + " by the name of \""
-              + enclosedElement.getSimpleName() + "\": " + enclosedElement);
+          System.out.println(
+              "XYZABC Found something: " + enclosedElement.getKind() + " by the name of \""
+                  + enclosedElement.getSimpleName() + "\": " + enclosedElement);
         }
       }
     }
-    String builderName = className + "Builder";
-    StringBuilder source = new StringBuilder().append("package ").append(packageName).append(";\n")
-        .append("public class ").append(builderName).append("{\n");
+    String packageLine = "package " + packageName + ";\n";
+    StringBuilder classOpening = new StringBuilder();
+    if (parentClass != null) {
+      classOpening.append("public class ").append(targetClassName).append(" {\n");
+    }
+    classOpening.append("public class ").append(builderName)
+        .append(" {\n");
+    StringBuilder source = new StringBuilder().append(packageLine)
+        .append(classOpening);
     for (Field field : fields) {
-      source.append("private ").append(field.getType()).append(" ").append(field.getName()).append(";\n");
+      source.append("private ").append(field.getType()).append(" ").append(field.getName())
+          .append(";\n");
       source.append("public ").append(builderName).append(" with").append(field.nameAsSuffix())
           .append("(").append(field.getType())
           .append(" ").append(field.getName()).append("){\nthis.").append(field.getName())
@@ -79,14 +103,18 @@ public class SuperBuilderAnnotationProcessor extends AbstractProcessor {
         .append(fields.stream().map(Field::getName).collect(Collectors.joining(",")))
         .append(");}\n");
     source.append("}");
+    if (parentClass != null) {
+      source.append("}");
+    }
 
     Builder builder = new Builder();
-    builder.className = packageName + "." + builderName;
+    builder.className = packageName + "." + targetClassName;
     builder.source = source.toString();
     return builder;
   }
 
   private static class Builder {
+
     String className;
     String source;
   }
