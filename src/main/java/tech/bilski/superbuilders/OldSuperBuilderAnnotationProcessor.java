@@ -18,7 +18,7 @@ import tech.bilski.superbuilders.model.Field;
 //@AutoService(Processor.class)
 //@SupportedAnnotationTypes("tech.bilski.superbuilders.SuperBuilder")
 //@SupportedSourceVersion(SourceVersion.RELEASE_8)
-public class SuperBuilderAnnotationProcessor extends AbstractProcessor {
+public class OldSuperBuilderAnnotationProcessor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
