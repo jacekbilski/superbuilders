@@ -61,4 +61,46 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <version>3.8.0</version>
+        <configuration>
+          <processors>
+            <processor>tech.bilski.superbuilders.spoon.SuperBuilderProcessor</processor>
+          </processors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>generate-superbuilders</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+          <!--execution>
+            <id>generate-test-superbuilders</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <includeTest>true</includeTest>
+              <includeSource>false</includeSource>
+            </configuration>
+          </execution-->
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>tech.bilski</groupId>
+            <artifactId>superbuilders</artifactId>
+            <version>1.0-SNAPSHOT</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
 </project>
