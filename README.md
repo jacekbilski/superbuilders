@@ -20,6 +20,7 @@ That's why the idea of Super Builders came to be, I simply didn't want to write 
 
 * generating builders for classes, records and maybe interfaces
 * generating builders for class hierarchies, with a possibility to set fields from superclasses
+* generating builders for inner classes/records/interfaces
 * no runtime dependency, only compile-time
 * pre-filling builders with random data
 * for fields with complex types
