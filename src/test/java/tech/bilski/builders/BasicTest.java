@@ -4,19 +4,30 @@ import org.junit.jupiter.api.Test;
 import tech.bilski.builders.fixture.TestClass;
 import tech.bilski.builders.fixture.TestClassBuilder;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class BasicTest {
 
+	private final TestClassBuilder builder = new TestClassBuilder();
+
 	@Test
 	void builderClassIsCreated() {
-		var builder = new TestClassBuilder();
 	}
 
 	@Test
 	void builderBuildsCorrectClass() {
-		var builder = new TestClassBuilder();
 		var instance = builder.build();
 		assertThat(instance).isInstanceOf(TestClass.class);
+	}
+
+	@Test
+	void builderSupportsFields() {
+		var fieldValue = UUID.randomUUID().toString();
+		var instance = builder
+			.field(fieldValue)
+			.build();
+		assertThat(instance.field).isEqualTo(fieldValue);
 	}
 }
