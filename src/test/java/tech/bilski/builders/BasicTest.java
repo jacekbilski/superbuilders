@@ -30,4 +30,18 @@ class BasicTest {
 			.build();
 		assertThat(instance.field).isEqualTo(fieldValue);
 	}
+
+	@Test
+	void settingFieldReturnsNewBuilderInstance() {
+		var newBuilder = builder.field("value");
+		assertThat(newBuilder).isNotSameAs(builder);
+	}
+
+	@Test
+	void originalBuilderIsNotModifiedWhenFieldIsSet() {
+		var fieldValue = UUID.randomUUID().toString();
+		builder.field(fieldValue);
+		var instance = builder.build();
+		assertThat(instance.field).isNull();
+	}
 }

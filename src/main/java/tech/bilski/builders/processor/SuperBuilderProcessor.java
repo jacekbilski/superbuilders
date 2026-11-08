@@ -119,16 +119,46 @@ public class SuperBuilderProcessor extends AbstractProcessor {
 			}
 			writer.write("public final class " + builderName + " {\n\n");
 			for (Property property : properties) {
-				writer.write("    private " + property.type() + " " + property.name() + ";\n");
+				writer.write("    private final " + property.type() + " " + property.name() + ";\n");
 			}
+			if (!properties.isEmpty()) {
+				writer.write("\n");
+			}
+			writer.write("    public " + builderName + "() {\n");
+			writer.write("        this(");
+			for (int i = 0; i < properties.size(); i++) {
+				if (i > 0) {
+					writer.write(", ");
+				}
+				writer.write("null");
+			}
+			writer.write(");\n");
+			writer.write("    }\n\n");
+			writer.write("    private " + builderName + "(");
+			for (int i = 0; i < properties.size(); i++) {
+				if (i > 0) {
+					writer.write(", ");
+				}
+				writer.write(properties.get(i).type() + " " + properties.get(i).name());
+			}
+			writer.write(") {\n");
+			for (Property property : properties) {
+				writer.write("        this." + property.name() + " = " + property.name() + ";\n");
+			}
+			writer.write("    }\n");
 			if (!properties.isEmpty()) {
 				writer.write("\n");
 			}
 			for (Property property : properties) {
 				writer.write("    public " + builderName + " " + property.name() + "(" + property.type()
 					+ " " + property.name() + ") {\n");
-				writer.write("        this." + property.name() + " = " + property.name() + ";\n");
-				writer.write("        return this;\n");
+				writer.write("        return new " + builderName + "(");
+				for (Property p : properties) {
+					if (p != property) {
+						writer.write("this." + p.name() + ", ");
+					}
+				}
+				writer.write(property.name() + ");\n");
 				writer.write("    }\n\n");
 			}
 			writer.write("    public " + simpleName + " build() {\n");
