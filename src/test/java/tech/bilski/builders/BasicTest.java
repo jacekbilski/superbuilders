@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class BasicTest {
 
-	private final TestClassBuilder builder = new TestClassBuilder();
+	private final TestClassBuilder builder = TestClassBuilder.builder();
 
 	@Test
 	void builderClassIsCreated() {

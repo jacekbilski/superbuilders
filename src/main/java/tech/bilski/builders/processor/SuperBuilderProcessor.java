@@ -118,63 +118,77 @@ public class SuperBuilderProcessor extends AbstractProcessor {
 				writer.write("package " + packageName + ";\n\n");
 			}
 			writer.write("public final class " + builderName + " {\n\n");
-			for (Property property : properties) {
-				writer.write("    private final " + property.type() + " " + property.name() + ";\n");
-			}
-			if (!properties.isEmpty()) {
-				writer.write("\n");
-			}
-			writer.write("    public " + builderName + "() {\n");
-			writer.write("        this(");
-			for (int i = 0; i < properties.size(); i++) {
-				if (i > 0) {
-					writer.write(", ");
-				}
-				writer.write("null");
-			}
-			writer.write(");\n");
-			writer.write("    }\n\n");
-			writer.write("    private " + builderName + "(");
-			for (int i = 0; i < properties.size(); i++) {
-				if (i > 0) {
-					writer.write(", ");
-				}
-				writer.write(properties.get(i).type() + " " + properties.get(i).name());
-			}
-			writer.write(") {\n");
-			for (Property property : properties) {
-				writer.write("        this." + property.name() + " = " + property.name() + ";\n");
-			}
-			writer.write("    }\n");
-			if (!properties.isEmpty()) {
-				writer.write("\n");
-			}
-			for (Property property : properties) {
-				writer.write("    public " + builderName + " " + property.name() + "(" + property.type()
-					+ " " + property.name() + ") {\n");
-				writer.write("        return new " + builderName + "(");
-				for (Property p : properties) {
-					if (p != property) {
-						writer.write("this." + p.name() + ", ");
-					}
-				}
-				writer.write(property.name() + ");\n");
-				writer.write("    }\n\n");
-			}
-			writer.write("    public " + simpleName + " build() {\n");
-			writer.write("        return new " + simpleName + "(");
-			for (int i = 0; i < properties.size(); i++) {
-				if (i > 0) {
-					writer.write(", ");
-				}
-				writer.write(properties.get(i).name());
-			}
-			writer.write(");\n");
-			writer.write("    }\n\n");
-			writer.write("    public static " + builderName + " builder() {\n");
-			writer.write("        return new " + builderName + "();\n");
-			writer.write("    }\n");
+			writeFields(writer, properties);
+			writeConstructors(writer, builderName, properties);
+			writeSetters(writer, builderName, properties);
+			writeBuildMethod(writer, simpleName, properties);
+			writeBuilderFactory(writer, builderName);
 			writer.write("}\n");
+		}
+	}
+
+	private void writeFields(Writer writer, List<Property> properties) throws IOException {
+		for (Property property : properties) {
+			writer.write("    private final " + property.type() + " " + property.name() + ";\n");
+		}
+		if (!properties.isEmpty()) {
+			writer.write("\n");
+		}
+	}
+
+	private void writeConstructors(Writer writer, String builderName, List<Property> properties) throws IOException {
+		writer.write("    public " + builderName + "() {\n");
+		writer.write("        this(");
+		writeJoined(writer, properties.size(), i -> "null");
+		writer.write(");\n");
+		writer.write("    }\n\n");
+		writer.write("    private " + builderName + "(");
+		writeJoined(writer, properties.size(), i -> properties.get(i).type() + " " + properties.get(i).name());
+		writer.write(") {\n");
+		for (Property property : properties) {
+			writer.write("        this." + property.name() + " = " + property.name() + ";\n");
+		}
+		writer.write("    }\n");
+		if (!properties.isEmpty()) {
+			writer.write("\n");
+		}
+	}
+
+	private void writeSetters(Writer writer, String builderName, List<Property> properties) throws IOException {
+		for (Property property : properties) {
+			writer.write("    public " + builderName + " " + property.name() + "(" + property.type()
+				+ " " + property.name() + ") {\n");
+			writer.write("        return new " + builderName + "(");
+			for (Property p : properties) {
+				if (p != property) {
+					writer.write("this." + p.name() + ", ");
+				}
+			}
+			writer.write(property.name() + ");\n");
+			writer.write("    }\n\n");
+		}
+	}
+
+	private void writeBuildMethod(Writer writer, String simpleName, List<Property> properties) throws IOException {
+		writer.write("    public " + simpleName + " build() {\n");
+		writer.write("        return new " + simpleName + "(");
+		writeJoined(writer, properties.size(), i -> properties.get(i).name());
+		writer.write(");\n");
+		writer.write("    }\n\n");
+	}
+
+	private void writeBuilderFactory(Writer writer, String builderName) throws IOException {
+		writer.write("    public static " + builderName + " builder() {\n");
+		writer.write("        return new " + builderName + "();\n");
+		writer.write("    }\n");
+	}
+
+	private void writeJoined(Writer writer, int count, java.util.function.IntFunction<String> element) throws IOException {
+		for (int i = 0; i < count; i++) {
+			if (i > 0) {
+				writer.write(", ");
+			}
+			writer.write(element.apply(i));
 		}
 	}
 
